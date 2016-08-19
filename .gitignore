@@ -1,3 +1,9 @@
-/bin/Debug/
-/obj/Debug/
-/Properties
+world/bin
+world/obj
+world/Properties
+engine/bin
+engine/obj
+engine/Properties
+alone/bin
+alone/obj
+alone/Properties
