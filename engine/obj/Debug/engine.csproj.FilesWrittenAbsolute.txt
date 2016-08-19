@@ -1,5 +1,0 @@
-/home/zdh/csharp/alone/engine/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
-/home/zdh/csharp/alone/engine/bin/Debug/engine.dll.mdb
-/home/zdh/csharp/alone/engine/bin/Debug/engine.dll
-/home/zdh/csharp/alone/engine/obj/Debug/engine.dll
-/home/zdh/csharp/alone/engine/obj/Debug/engine.dll.mdb

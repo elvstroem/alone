@@ -1,9 +1,0 @@
-/home/zdh/csharp/alone/alone/obj/x86/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
-/home/zdh/csharp/alone/alone/bin/Debug/alone.exe.mdb
-/home/zdh/csharp/alone/alone/bin/Debug/alone.exe
-/home/zdh/csharp/alone/alone/obj/x86/Debug/alone.exe
-/home/zdh/csharp/alone/alone/obj/x86/Debug/alone.exe.mdb
-/home/zdh/csharp/alone/alone/bin/Debug/engine.dll
-/home/zdh/csharp/alone/alone/bin/Debug/engine.dll.mdb
-/home/zdh/csharp/alone/alone/bin/Debug/world.dll
-/home/zdh/csharp/alone/alone/bin/Debug/world.dll.mdb
