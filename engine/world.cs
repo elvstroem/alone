@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using engine;
 
-namespace world
+namespace engine
 {
 	public class World
 	{
@@ -11,7 +11,6 @@ namespace world
 		public static readonly List<Monster> Monsters = new List<Monster>();
 		public static readonly List<Quest> Quests = new List<Quest>();
 		public static readonly List<Location> Locations = new List<Location>();
-		public static readonly List<PlayerQuest> pQuests = new List<PlayerQuest> ();
 
 		// const variabler då dessa värden aldrig ska ändras
 		// public för att de ska kunna nås genom hela programmet
@@ -105,7 +104,7 @@ namespace world
 					QUEST_ID_START_QUEST,
 					"Make your way to the gate",
 					"All hope is lost! Only hope for salvation is if you make it to the gate!\n" +
-					"Show your worth by killing a zombie on your way over and collect some Rotting flesh", 10, 10);
+					"Show your worth by killing a zombie on your way over and collect some Rotting flesh", 100, 10);
 
 			startQuest.QuestCompletionItems.Add (new QuestCompletionItem (ItemByID (ITEM_ID_ROTTING_FLESH), 1));
 			startQuest.RewardItem = ItemByID (ITEM_ID_HEALING_POTION);
@@ -114,10 +113,11 @@ namespace world
 				new Quest (
 					QUEST_ID_CLEAR_FORREST,
 					"Clear the forrest of wolfs",
-					"Kill of the wolfs and bring back 3 pelts", 10, 10);
+					"Kill of the wolfs and bring back 3 sharp fangs", 10, 10);
 
 			clearForrest.QuestCompletionItems.Add (new QuestCompletionItem (ItemByID (ITEM_ID_SHARP_FANG), 3));
 			clearForrest.RewardItem = ItemByID (ITEM_ID_MULTI_PASS);
+			clearForrest.RewardItem = ItemByID (ITEM_ID_HEALING_POTION);
 
 			Quest clearPassage =
 				new Quest (
@@ -144,7 +144,6 @@ namespace world
 			Quests.Add (clearForrest);
 			Quests.Add (clearPassage);
 			Quests.Add (clearGraveyard);
-			pQuests.Add (new PlayerQuest(startQuest));
 		}
 
 		// Metod för att skapa Locations.
@@ -173,9 +172,11 @@ namespace world
 			// Town Square
 			Location townSquare = new Location (LOCATION_ID_TOWN_SQUARE, "Town Square", "Everythings grey or looks grey, I mean everything. Altho the fire in the middle is quite nice.");
 			townSquare.QuestAvailableHere = QuestByID (QUEST_ID_CLEAR_GRAVEYARD);
+			townSquare.QuestCompletionArea = QuestByID (QUEST_ID_CLEAR_FORREST);
 
 			// Local Inn
 			Location inn = new Location (LOCATION_ID_INN, "Happy Bobs Inn", "Says 'Happy Bobs Inn' on the sign, but the fellows here looks nothing like a happy bunch.");
+			inn.QuestAvailableHere = QuestByID (QUEST_ID_CLEAR_FORREST);
 
 			// Bridge
 			Location bridge = new Location (LOCATION_ID_BRIDGE, "Old Bridge", "Old wooden bridge, looks quite sturdy.");
@@ -189,6 +190,8 @@ namespace world
 			graveyard.MonsterLivingHere = MonsterByID (MONSTER_ID_SKELETON);
 			graveyard.ItemRequiredToEnter = ItemByID (ITEM_ID_MULTI_PASS);
 
+			// home
+			Location home = inn;
 			// LocationTo* för att veta vilket håll man ska
 			// tex. 'inn.LocationToSouth = townSquare' visar att den enda
 			// vägen man kan gå om man står på inn är South. Skulle man försöka
@@ -227,8 +230,10 @@ namespace world
 			Locations.Add (graveyard);
 			Locations.Add (bridge);
 			Locations.Add (forrest);
+			Locations.Add (home);
 		}
 
+		// Kör metoderna så att listorna fylls
 		static World()
 		{
 			PopulateItems();
