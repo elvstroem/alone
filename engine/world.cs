@@ -104,7 +104,7 @@ namespace engine
 					QUEST_ID_START_QUEST,
 					"Make your way to the gate",
 					"All hope is lost! Only hope for salvation is if you make it to the gate!\n" +
-					"Show your worth by killing a zombie on your way over and collect some Rotting flesh", 100, 10);
+					"Show your worth by killing a zombie on your way over and collect some Rotting flesh!", 10, 10);
 
 			startQuest.QuestCompletionItems.Add (new QuestCompletionItem (ItemByID (ITEM_ID_ROTTING_FLESH), 1));
 			startQuest.RewardItem = ItemByID (ITEM_ID_HEALING_POTION);
@@ -159,6 +159,7 @@ namespace engine
 			// West Passage
 			Location westPassage = new Location (LOCATION_ID_WEST_PASSAGE, "West Passage", "Nothing much here to see, just a road leading somewhere.");
 			westPassage.MonsterLivingHere = MonsterByID (MONSTER_ID_ZOMBIE);
+
 
 			// West Passage
 			Location eastPassage = new Location (LOCATION_ID_EAST_PASSAGE, "East Passage", "Just gravel road, but you see a gloomy graveyard in the distance.");

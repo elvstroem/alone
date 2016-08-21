@@ -5,15 +5,20 @@ using System.Diagnostics;
 
 namespace engine
 {
+
+	// man använder ": Klass" för att visa att en klass har en basklass
+	// som nedan. När man sedan definerar "public player()" så lägger man till
+	// "public player()':base()'" för att visa vilka properties som ska användas
+	// från basklassen.
+
 	// Player Klass med Living som bas klass
 	public class Player : Living
 	{
-		
-
+		// Player properties
 		public string Name { get; set; }
 		public int Gold { get; set; }
 		public int ExperiencePoints { get; set; }
-		public int Level { get; set; }
+		public int Level { get { return ((ExperiencePoints / 100) + 1); } }
 		public Monster CurrentMonster { get; set; }
 		public Weapon CurrentWeapon { get; set; }
 		public Location CurrentLocation { get; set; }
@@ -23,12 +28,12 @@ namespace engine
 		public List<Weapon> Weapons { get; set; }
 
 		// Player constructor
-		public Player (string name, int currentHitPoints, int maximumHitPoints, int gold, int experiencePoints, int level) : base (currentHitPoints, maximumHitPoints)
+		public Player (string name, int currentHitPoints, int maximumHitPoints, int gold, int experiencePoints) : base (currentHitPoints, maximumHitPoints)
 		{
 			Name = name;
 			Gold = gold;
 			ExperiencePoints = experiencePoints;
-			Level = level;
+			//Level = level;
 
 			// skapa ny inventory för Player
 			//Inventory = new List<InventoryItem>();
@@ -37,6 +42,7 @@ namespace engine
 			Quests = new List<PlayerQuest>();
 		}
 
+		// Kollar iaf man behöver ett item för att nå en specifik plats
 		public bool HasRequiredItemToEnterThisLocation(Location location)
 		{
 			if (location.ItemRequiredToEnter == null) {
@@ -55,6 +61,7 @@ namespace engine
 			return false;
 		}
 
+		// kollar iaf man har den quest den frågar efter
 		public bool HasThisQuest(Quest quest)
 		{
 			foreach (PlayerQuest playerQuest in Quests) {
@@ -65,6 +72,7 @@ namespace engine
 			return false;
 		}
 
+		// kollar iaf man har gjort färdigt questen
 		public bool CompletedThisQuest(Quest quest)
 		{
 			foreach (PlayerQuest playerQuest in Quests) {
@@ -75,27 +83,57 @@ namespace engine
 			return false;
 		}
 
-		// for loop går genom hela Inventory arrayen och foreach går genom
-		// hela QuestCompletionItems listan. Om inventory[i] inte är null så
-		// kollar den iaf man har tillräckligt många av typen man behöver
-		// för att kunna lämna in questen. Iaf det är sant så retunera true;
-		// annars retunera false;
+		// kollar om man har alla items för att slutaföra en quest
 		public bool HasAllQuestCompletionItems(Quest quest)
 		{
-			bool found = false;
-			for(int i = 0; i < Inventory.Length; i++) {
-				for(int j = 0; j < quest.QuestCompletionItems.Count; j++) {
-					if(Inventory[i] != null) {
-						if(Inventory[i].Details.ID == quest.QuestCompletionItems[j].Details.ID) {
-							if(Inventory[i].Quantity >= quest.QuestCompletionItems[j].Quantity) {
-								found = true;
+			// foreach loop om questen har 1 QuestCompletionItem
+			// Retunerar true om Item i Inventory matchar QuestCompletionItem och
+			// man har tillräckligt många av dem
+			if (quest.QuestCompletionItems.Count == 1) {
+				foreach (QuestCompletionItem qci in quest.QuestCompletionItems) {
+					foreach (InventoryItem ii in Inventory) {
+						if (ii != null) {
+							if (ii.Details.ID == qci.Details.ID && ii.Quantity >= qci.Quantity) {
+								return true;
+							}
+						} 
+					}
+				}
+			} 
+				// foreach loop om questen har 2 eller fler QuestCompletionItems
+				else if (quest.QuestCompletionItems.Count >= 2) {
+				int count = 0;
+				foreach (QuestCompletionItem qci in quest.QuestCompletionItems) {
+					foreach (InventoryItem ii in Inventory) {
+						if (ii != null) {
+							if (ii.Details.ID == qci.Details.ID && ii.Quantity >= qci.Quantity) {
+								// om det matchar och kvantiteten matchar så plussas count på
+								count += 1;
+								// om count är lika med QuestCompletionItems.Count så retunera true
+								if (count == quest.QuestCompletionItems.Count) {
+									return true;
+								}
 							}
 						}
 					}
 				}
 			}
-			//Console.WriteLine(found);
-			return found;
+			return false;
+		}
+
+		// Kollar av om man har en del av itemsen som behövs för att lämna in questen
+		public bool HasPartialQuestCompletionItems(Quest quest)
+		{
+			foreach (QuestCompletionItem qci in quest.QuestCompletionItems) {
+				foreach (InventoryItem ii in Inventory) {
+					if (ii != null) {
+						if (ii.Details.ID == qci.Details.ID && ii.Quantity < qci.Quantity) {
+							return true;
+						} 
+					}
+				}
+			}
+			return false;
 		}
 
 		// Förlitar sig på 'HasAllQuestCompletionItems' metoden och får signal
@@ -174,6 +212,9 @@ namespace engine
 			}
 		}
 
+		// Metod för att ta bort ett item ifrån Inventory
+		// Går genom Arrayen steg för steg och om ID matchar så dras det bort 1 från Quantity.
+		// Om Quantity är 0, så nulliferas platsen i arrayen så att den kan användas på nytt.
 		public void RemoveItemFromInventory(Item itemToRemove, int quantity = 1)
 		{
 			for (int i = 0; i < Inventory.Length; i++) {
@@ -189,6 +230,7 @@ namespace engine
 			}
 		}
 
+		// Markerar att questen är slutförd
 		public void MarkQuestCompleted(Quest quest)
 		{
 			foreach (PlayerQuest pq in Quests) {
@@ -199,6 +241,7 @@ namespace engine
 			}
 		}
 
+		// Flyttmetod
 		public void MoveTo(Location location)
 		{
 			// kollar om man har ett specifikt item för att kunna 
@@ -209,6 +252,7 @@ namespace engine
 			}
 
 			CurrentLocation = location;
+			Heal ();
 
 			// Kollar ifall man har en quest när man kommer till en ny location
 			// har man inte den, så får man den. Kollar sedan efter om man har
@@ -238,6 +282,12 @@ namespace engine
 			CurrentMonsterLocation (location);
 		}
 
+		private void Heal()
+		{
+			CurrentHitPoints = MaximumHitPoints;
+		}
+
+		// Metod för att spawna ett nytt monster
 		private void CurrentMonsterLocation(Location location)
 		{
 			CurrentMonster = location.SpawnMonsterLivingHere ();
@@ -247,6 +297,7 @@ namespace engine
 			}
 		}
 
+		// Metod för att ge användaren en ny quest
 		private void GivePlayerQuest(Quest quest)
 		{
 			Console.WriteLine ("You receive the: " + quest.Name + " quest.");
@@ -254,6 +305,7 @@ namespace engine
 			Quests.Add (new PlayerQuest (quest));
 		}
 
+		// metod för att ge användaren QuestRewards när man har slutfört questen
 		private void GiveQuestReward(Quest quest)
 		{
 			Console.WriteLine ("");
@@ -272,10 +324,13 @@ namespace engine
 			MarkQuestCompleted (quest);
 		}
 
+		// metod för att slåss
 		public void UseWeapon(Weapon weapon)
 		{
+			// använder en RandomNumberGenerator för att slumpa damage
 			int damage = RNG.NumberBetween (weapon.MinimumDamage, weapon.MaximumDamage);
 			if (CurrentMonster != null) {
+				// om damage är = 0
 				if (damage == 0) {
 					Console.WriteLine ("You missed the " + CurrentMonster.Name);
 				} else {
@@ -283,21 +338,26 @@ namespace engine
 					Console.WriteLine ("You hit the " + CurrentMonster.Name + " for " + damage + " point.");
 				}
 
+				// if statement för att se om monstret fortfarande lever
 				if (CurrentMonster.CurrentHitPoints <= 0) {
 					LootCurrentMonster ();
-					CurrentMonster = null;
+					// Kör MoveTo för att monstret ska respawna.
+					MoveTo (CurrentLocation);
 				} else {
 					LetMobAttack ();
 				}
 			} else {
+				// om där inte finns något monster
 				if (CurrentMonster == null) {
 					Console.WriteLine ("There is nothing to attack.");
 				}
 			}
 		}
 
+		// metod för att monstret ska kunna slå på en
 		private void LetMobAttack()
 		{
+			// använder RandomNumberGenerator för att slumpa monstrets damage
 			int damageToPlayer = RNG.NumberBetween (0, CurrentMonster.MaximumDamage);
 			if (damageToPlayer == 0) {
 				Console.WriteLine (CurrentMonster.Name + " missed you.");
@@ -306,11 +366,16 @@ namespace engine
 
 				CurrentHitPoints -= damageToPlayer;
 			}
+
+			// om man dör så flyttas man tillbaka till start
 			if (CurrentHitPoints <= 0) {
 				Console.WriteLine ("The " + CurrentMonster.Name + " killed you.");
+				Console.WriteLine ("Moving you back to start!\n");
+				MoveTo (World.LocationByID (World.LOCATION_ID_START));
 			}
 		}
 
+		// metod för att få alla questrewards
 		private void LootCurrentMonster ()
 		{
 			Console.WriteLine ("");
@@ -327,10 +392,11 @@ namespace engine
 			}
 		}
 
+		// addera experience points till användarens experiencePoints
 		private void AddExperiencePoints(int experiencePointsToAdd)
 		{
 			ExperiencePoints += experiencePointsToAdd;
-			MaximumHitPoints = (Level * 10);
+			MaximumHitPoints = (Level * 20);
 		}
 		// metod för att flytta Norr
 		public void MoveNorth()

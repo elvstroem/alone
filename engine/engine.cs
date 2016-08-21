@@ -67,15 +67,11 @@ namespace engine
 
 		public Monster SpawnMonsterLivingHere()
 		{
+			// om MonsterLivingHere == null så retunera null, om inte
+			// retunera ett monster som "bor" där.
 			return MonsterLivingHere == null ? null : MonsterLivingHere.SpawnMonster ();
 		}
 	}
-	
-
-	// man använder ": Klass" för att visa att en klass har en basklass
-	// som nedan. När man sedan definerar "public player()" så lägger man till
-	// "public player()':base()'" för att visa vilka properties som ska användas
-	// från basklassen.
 
 	// Monster klass som även använder basen Living för att konstruera ett objekt
 	public class Monster : Living
@@ -101,22 +97,28 @@ namespace engine
 			LootItems = new List<InventoryItem> ();
 		}
 
+		// spawnmonster metod
 		internal Monster SpawnMonster()
 		{
+			// Skapar ett nytt monster
 			Monster newMonster =
 				new Monster (ID, Name, MaximumDamage, RewardExperiencePoints, RewardGold, CurrentHitPoints,
 					MaximumHitPoints);
 
+			// fyller monstret lootinventory med hjälp av RNG
 			foreach (LootItem lootItem in LootTable.Where(lootItem => RNG.NumberBetween(1, 100) <= lootItem.DropPercentage)) {
 				newMonster.LootItems.Add (new InventoryItem (lootItem.Details, 1));
 			}
 
+			// skulle där inte vara några items i lootitems
+			// så adderas här istället de lootitems som finns i LootTable
 			if (newMonster.LootItems.Count == 0) {
 				foreach (LootItem lootItem in LootTable.Where(x => x.IsDefaultItem)) {
 					newMonster.LootItems.Add (new InventoryItem (lootItem.Details, 1));
 				}
 			}
 
+			// retunera de nya monstret
 			return newMonster;
 		}
 	}

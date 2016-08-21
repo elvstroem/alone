@@ -42,9 +42,5 @@
       <Project>{27469C17-809C-46E6-B699-4022323DA0EF}</Project>
       <Name>engine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\world\world.csproj">
-      <Project>{79EB7749-BBAB-49A6-92FB-6DC3F9C78D47}</Project>
-      <Name>world</Name>
-    </ProjectReference>
   </ItemGroup>
 </Project>
